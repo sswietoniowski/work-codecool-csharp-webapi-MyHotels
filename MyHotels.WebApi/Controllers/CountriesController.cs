@@ -16,13 +16,13 @@ namespace MyHotels.WebApi.Controllers
     [Route("api/[controller]")]
     public class CountriesController : ControllerBase
     {
-        private readonly IUnitOfWork _uwo;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
         private readonly ILogger<CountriesController> _logger;
 
         public CountriesController(IUnitOfWork uwo, IMapper mapper, ILogger<CountriesController> logger)
         {
-            this._uwo = uwo;
+            this._uow = uwo;
             this._mapper = mapper;
             this._logger = logger;
         }
@@ -36,7 +36,7 @@ namespace MyHotels.WebApi.Controllers
 
             try
             {
-                var countries = await _uwo.Countries.GetAll();
+                var countries = await _uow.Countries.GetAll();
                 var results = _mapper.Map<IList<CountryDto>>(countries);
                 return Ok(results);
             }
@@ -58,7 +58,7 @@ namespace MyHotels.WebApi.Controllers
 
             try
             {
-                var country = await _uwo.Countries.Get(country => country.Id == id, new List<string> { "Hotels" });
+                var country = await _uow.Countries.Get(c => c.Id == id, new List<string> { "Hotels" });
 
                 if (country == null)
                 {
@@ -81,7 +81,7 @@ namespace MyHotels.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateCountry([FromBody] CreateCountryDto countryDto)
         {
-            _logger.LogInformation($"{nameof(GetCountry)} called...");
+            _logger.LogInformation($"{nameof(CreateCountry)} called...");
 
             if (!ModelState.IsValid)
             {
@@ -92,8 +92,8 @@ namespace MyHotels.WebApi.Controllers
             try
             {
                 var country = _mapper.Map<Country>(countryDto);
-                await _uwo.Countries.Add(country);
-                await _uwo.Save();
+                await _uow.Countries.Add(country);
+                await _uow.Save();
 
                 return CreatedAtRoute("GetCountry", new { id = country.Id }, country);
             }
@@ -103,5 +103,43 @@ namespace MyHotels.WebApi.Controllers
                 return Problem("Internal server error, please try again later...");
             }
         }
+
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateCountry(int id, [FromBody] UpdateCountryDto countryDto)
+        {
+            _logger.LogInformation($"{nameof(GetCountry)} called...");
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError($"Invalid PUT attempt in {nameof(CreateCountry)}");
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var country = await _uow.Countries.Get(c => c.Id == id);
+
+                if (country == null)
+                {
+                    return BadRequest("Submitted data is invalid!");
+                }
+
+                _mapper.Map(countryDto, country);
+                _uow.Countries.Modify(country);
+                await _uow.Save();
+
+                return NoContent();
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, $"Something went wrong in {nameof(UpdateCountry)}");
+                return Problem("Internal server error, please try again later...");
+            }
+        }
+
+
     }
 }
