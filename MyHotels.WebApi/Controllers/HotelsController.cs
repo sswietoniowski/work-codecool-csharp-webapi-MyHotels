@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MyHotels.WebApi.Domain;
 using MyHotels.WebApi.Infrastructure;
 using MyHotels.WebApi.Models;
 using System;
@@ -58,6 +59,28 @@ namespace MyHotels.WebApi.Controllers
             var result = _mapper.Map<HotelDto>(hotel);
 
             return Ok(hotel);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateHotel([FromBody] CreateHotelDto hotelDto)
+        {
+            _logger.LogInformation($"{nameof(CreateHotel)} called...");
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError($"Invalid POST attempt in {nameof(CreateHotel)}");
+
+                return BadRequest(ModelState);
+            }
+
+            var hotel = _mapper.Map<Hotel>(hotelDto);
+            await _uow.Hotels.Add(hotel);
+            await _uow.Save();
+
+            return CreatedAtRoute("GetHotel", new { id = hotel.Id }, hotel);
         }
     }
 }
