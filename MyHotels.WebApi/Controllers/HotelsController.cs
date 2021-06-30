@@ -82,5 +82,52 @@ namespace MyHotels.WebApi.Controllers
 
             return CreatedAtRoute("GetHotel", new { id = hotel.Id }, hotel);
         }
+
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateHotel(int id, [FromBody] UpdateHotelDto hotelDto)
+        {
+            _logger.LogInformation($"{nameof(UpdateHotel)} called...");
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError($"Invalid PUT attempt in {nameof(UpdateHotel)}");
+
+                return BadRequest(ModelState);
+            }
+
+            var hotel = await _uow.Hotels.Get(h => h.Id == id);
+
+            if (hotel == null)
+            {
+                return BadRequest("Submitted data is invalid!");
+            }
+
+            _mapper.Map(hotelDto, hotel);
+            _uow.Hotels.Modify(hotel);
+            await _uow.Save();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteHotel(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteHotel)} called...");
+
+            var hotel = await _uow.Hotels.Get(h => h.Id == id);
+
+            if (hotel == null)
+            {
+                return NotFound($"Not found hotel with id = {id}");
+            }
+
+            await _uow.Hotels.Remove(id);
+            await _uow.Save();
+
+            return NoContent();
+        }
     }
 }
