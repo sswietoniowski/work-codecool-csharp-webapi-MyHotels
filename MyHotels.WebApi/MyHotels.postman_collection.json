@@ -1,0 +1,251 @@
+{
+	"info": {
+		"_postman_id": "bf0b8719-2d09-4520-88f6-4e9708b98fe4",
+		"name": "MyHotels",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Countries - GetCountries",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44335/api/Countries",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Countries"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Countries - GetCountry",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44335/api/Countries/4",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Countries",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Countries - CreateCountry",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Russia\",\r\n  \"code\": \"RO\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44335/api/Countries",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Countries"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Countries - UpdateCountry",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Japan\",\r\n    \"code\": \"JP\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44335/api/Countries/4",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Countries",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Countries - DeleteCountry",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44335/api/Countries/4",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Countries",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Hotels - GetHotels",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44335/api/Hotels",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Hotels"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Hotels - GetHotel",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44335/api/Hotels/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Hotels",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Hotels - CreateHotel",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Great Failure\",\r\n  \"address\": \"New York\",\r\n  \"rating\": 1.0,\r\n  \"countryId\": 3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44335/api/Hotels",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Hotels"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Hotels - UpdateHotel",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Great Failure\",\r\n  \"address\": \"New York\",\r\n  \"rating\": 4.0,\r\n  \"countryId\": 3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44335/api/Hotels/5",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Hotels",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Hotels - DeleteHotel",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44335/api/Hotels/5",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Hotels",
+						"5"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

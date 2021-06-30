@@ -113,6 +113,10 @@ namespace MyHotels.WebApi.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteHotel(int id)
         {
             _logger.LogInformation($"{nameof(DeleteHotel)} called...");
