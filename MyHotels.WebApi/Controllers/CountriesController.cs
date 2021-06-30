@@ -110,7 +110,7 @@ namespace MyHotels.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateCountry(int id, [FromBody] UpdateCountryDto countryDto)
         {
-            _logger.LogInformation($"{nameof(GetCountry)} called...");
+            _logger.LogInformation($"{nameof(UpdateCountry)} called...");
 
             if (!ModelState.IsValid)
             {
@@ -140,6 +140,41 @@ namespace MyHotels.WebApi.Controllers
             }
         }
 
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteCountry(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteCountry)} called...");
 
+            if (id < 1)
+            {
+                _logger.LogError($"Invalid DELETE attempt in {nameof(DeleteCountry)}");
+                return BadRequest();
+            }
+
+
+            try
+            {
+                var country = await _uow.Countries.Get(c => c.Id == id);
+
+                if (country == null)
+                {
+                    return NotFound($"There is not country with this id = {id}");
+                }
+
+                await _uow.Countries.Remove(id);
+                await _uow.Save();
+
+                return NoContent();
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, $"Something went wrong in {nameof(DeleteCountry)}");
+                return Problem("Internal server error, please try again later...");
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MyHotels.WebApi.Data;
+using MyHotels.WebApi.Extensions;
 using MyHotels.WebApi.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,8 @@ namespace MyHotels.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             // DbContext
-            services.AddDbContext<MyHotelsDbContext>(options => {
+            services.AddDbContext<MyHotelsDbContext>(options => 
+            {
                 options.UseSqlServer(Configuration.GetConnectionString("MssqlConnection"));
             });
 
@@ -63,6 +65,8 @@ namespace MyHotels.WebApi
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyHotels.WebApi v1"));
             }
+
+            app.ConfigureExceptionHandler();
 
             app.UseHttpsRedirection();
 
