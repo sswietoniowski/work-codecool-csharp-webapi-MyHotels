@@ -9,9 +9,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MyHotels.WebApi.Data;
+using MyHotels.WebApi.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace MyHotels.WebApi
@@ -28,9 +30,16 @@ namespace MyHotels.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // DbContext
             services.AddDbContext<MyHotelsDbContext>(options => {
                 options.UseSqlServer(Configuration.GetConnectionString("MssqlConnection"));
             });
+
+            // UnitOfWork
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+
+            // Automapper
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
