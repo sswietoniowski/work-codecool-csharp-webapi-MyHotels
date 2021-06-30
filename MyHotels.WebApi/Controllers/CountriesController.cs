@@ -44,6 +44,7 @@ namespace MyHotels.WebApi.Controllers
             {
                 _logger.LogError(exception, $"Something went wrong in {nameof(GetCountries)}");
                 //return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error, please try again later...");
+
                 return Problem("Internal server error, please try again later...");
             }
         }
@@ -66,11 +67,13 @@ namespace MyHotels.WebApi.Controllers
                 }
 
                 var result = _mapper.Map<CountryDto>(country);
+
                 return Ok(result);
             }
             catch (Exception exception)
             {
                 _logger.LogError(exception, $"Something went wrong in {nameof(GetCountry)}");
+
                 return Problem("Internal server error, please try again later...");
             }
         }
@@ -86,6 +89,7 @@ namespace MyHotels.WebApi.Controllers
             if (!ModelState.IsValid)
             {
                 _logger.LogError($"Invalid POST attempt in {nameof(CreateCountry)}");
+
                 return BadRequest(ModelState);
             }
 
@@ -173,6 +177,7 @@ namespace MyHotels.WebApi.Controllers
             catch (Exception exception)
             {
                 _logger.LogError(exception, $"Something went wrong in {nameof(DeleteCountry)}");
+
                 return Problem("Internal server error, please try again later...");
             }
         }

@@ -34,12 +34,30 @@ namespace MyHotels.WebApi.Controllers
         {
             _logger.LogInformation($"{nameof(GetHotels)} called...");
 
-            var hotels = await _uow.Hotels.GetAll(includes: new List<string> { "Country" });
+            var hotels = await _uow.Hotels.GetAll();
             var results = _mapper.Map<IList<HotelDto>>(hotels);
 
             return Ok(results);
         }
 
+        [HttpGet("{id:int}", Name = "GetHotel")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<HotelDto>> GetHotel(int id)
+        {
+            _logger.LogInformation($"{nameof(GetHotel)} called...");
 
+            var hotel = await _uow.Hotels.Get(h => h.Id == id, includes: new List<string> { "Country" });
+
+            if (hotel == null)
+            {
+                return NotFound($"Not found hotel with id = {id}");
+            }
+
+            var result = _mapper.Map<HotelDto>(hotel);
+
+            return Ok(hotel);
+        }
     }
 }
