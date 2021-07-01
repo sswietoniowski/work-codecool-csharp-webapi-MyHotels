@@ -55,6 +55,9 @@ namespace MyHotels.WebApi
             // Throttling
             services.ConfigureRateLimiting();
 
+            // Caching
+            services.ConfigureCaching();
+
             services.AddControllers()
                 // Solves problem with cyclical dependency between countries and hotels.
                 .AddNewtonsoftJson(options => {
@@ -89,6 +92,9 @@ namespace MyHotels.WebApi
 
             // Throttling
             app.UseRateLimiting();
+
+            // Caching
+            app.UseCaching();
 
             app.UseRouting();
 

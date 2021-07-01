@@ -1,4 +1,5 @@
 ﻿using AspNetCoreRateLimit;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -91,6 +92,21 @@ namespace MyHotels.WebApi.Extensions
             services.AddHttpContextAccessor();
         }
 
+        public static void ConfigureCaching(this IServiceCollection services)
+        {
+            services.AddResponseCaching();
+            services.AddHttpCacheHeaders(
+                (expirationOptions) =>
+                {
+                    expirationOptions.MaxAge = 60;
+                    expirationOptions.CacheLocation = CacheLocation.Private;
+                },
+                (validationOptions) =>
+                {
+                    validationOptions.MustRevalidate = true;
+                });
+        }
+
         public static void UseCustomExceptionHandler(this IApplicationBuilder app)
         {
             app.UseExceptionHandler(error =>
@@ -123,6 +139,12 @@ namespace MyHotels.WebApi.Extensions
         public static void UseRateLimiting(this IApplicationBuilder app)
         {
             app.UseIpRateLimiting();
+        }
+
+        public static void UseCaching(this IApplicationBuilder app)
+        {
+            app.UseResponseCaching();
+            app.UseHttpCacheHeaders();
         }
     }
 }
