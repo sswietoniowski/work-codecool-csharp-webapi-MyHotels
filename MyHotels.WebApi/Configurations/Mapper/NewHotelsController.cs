@@ -48,5 +48,18 @@ namespace MyHotels.WebApi.Configurations.Mapper
 
             return Ok(hotel);
         }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IList<HotelDto>>> GetHotels([FromQuery] RequestParams requestParams)
+        {
+            _logger.LogInformation($"{nameof(GetHotels)} called...");
+
+            var hotels = await _uow.Hotels.GetAllPaged(requestParams);
+            var results = _mapper.Map<IList<HotelDto>>(hotels);
+
+            return Ok(results);
+        }
     }
 }

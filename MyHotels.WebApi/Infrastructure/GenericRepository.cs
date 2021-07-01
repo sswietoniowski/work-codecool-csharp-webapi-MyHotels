@@ -69,9 +69,9 @@ namespace MyHotels.WebApi.Infrastructure
             }
 
             return await query.AsNoTracking().ToListAsync();
-        }
+        } 
 
-        public async Task<IPagedList<T>> GetPagedAll(RequestParams requestParams, List<string> includes = null)
+        public async Task<IPagedList<T>> GetAllPaged(RequestParams requestParams, List<string> includes = null)
         {
             IQueryable<T> query = _db;
 
