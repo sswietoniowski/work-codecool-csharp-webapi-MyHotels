@@ -43,7 +43,6 @@ namespace MyHotels.WebApi
             // Automapper
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-
             // CORS - create policy
             services.ConfigureCorsPolicy();
 
@@ -52,6 +51,9 @@ namespace MyHotels.WebApi
 
             // JWT
             services.ConfigureJwt(Configuration);
+
+            // Throttling
+            services.ConfigureRateLimiting();
 
             services.AddControllers()
                 // Solves problem with cyclical dependency between countries and hotels.
@@ -84,6 +86,9 @@ namespace MyHotels.WebApi
 
             // CORS
             app.UseCorsPolicy();
+
+            // Throttling
+            app.UseRateLimiting();
 
             app.UseRouting();
 

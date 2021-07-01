@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -41,24 +42,6 @@ namespace MyHotels.WebApi.Extensions
             builder.AddEntityFrameworkStores<MyHotelsDbContext>().AddDefaultTokenProviders();
         }
 
-        public static void UseCustomExceptionHandler(this IApplicationBuilder app)
-        {
-            app.UseExceptionHandler(error =>
-            {
-                error.Run(async context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    context.Response.ContentType = "application/json";
-                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    if (contextFeature != null)
-                    {
-                        Log.Error($"Something went wrong in {contextFeature.Error}");
-                        await context.Response.WriteAsync(new Error { StatusCode = context.Response.StatusCode, Message = "Internal server error, please try again later..." }.ToString());
-                    }
-                });
-            });
-        }
-
         public static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtSettings = configuration.GetSection("Jwt");
@@ -84,6 +67,48 @@ namespace MyHotels.WebApi.Extensions
             services.AddScoped<IAuthenticationManager, AuthenticationManager>();
         }
 
+        public static void ConfigureRateLimiting(this IServiceCollection services)
+        {
+            services.AddMemoryCache();
+
+            var rateLimitRules = new List<RateLimitRule>
+            {
+                new RateLimitRule
+                {
+                    Endpoint = "*",
+                    Limit = 1,
+                    Period = "5s"
+                }
+            };
+
+            services.Configure<IpRateLimitOptions>(options =>
+            {
+                options.GeneralRules = rateLimitRules;
+            });
+
+            services.AddInMemoryRateLimiting();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddHttpContextAccessor();
+        }
+
+        public static void UseCustomExceptionHandler(this IApplicationBuilder app)
+        {
+            app.UseExceptionHandler(error =>
+            {
+                error.Run(async context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    context.Response.ContentType = "application/json";
+                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+                    if (contextFeature != null)
+                    {
+                        Log.Error($"Something went wrong in {contextFeature.Error}");
+                        await context.Response.WriteAsync(new Error { StatusCode = context.Response.StatusCode, Message = "Internal server error, please try again later..." }.ToString());
+                    }
+                });
+            });
+        }
+
         public static void UseCorsPolicy(this IApplicationBuilder app)
         {
             app.UseCors("AllowAll");
@@ -93,6 +118,11 @@ namespace MyHotels.WebApi.Extensions
         {
             app.UseAuthentication();
             app.UseAuthorization();
+        }
+
+        public static void UseRateLimiting(this IApplicationBuilder app)
+        {
+            app.UseIpRateLimiting();
         }
     }
 }
