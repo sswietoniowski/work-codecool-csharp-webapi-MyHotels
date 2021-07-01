@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using MyHotels.WebApi.Data;
+using MyHotels.WebApi.Domain;
 using MyHotels.WebApi.Models;
 using Serilog;
 using System;
@@ -28,7 +31,10 @@ namespace MyHotels.WebApi.Extensions
 
         public static void ConfigureAuthenticationAndIdentityManagement(this IServiceCollection services)
         {
-
+            services.AddAuthentication();
+            var builder = services.AddIdentityCore<ApiUser>(q => q.User.RequireUniqueEmail = true);
+            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
+            builder.AddEntityFrameworkStores<MyHotelsDbContext>().AddDefaultTokenProviders();
         }
 
         public static void UseCustomExceptionHandler(this IApplicationBuilder app)
@@ -52,6 +58,12 @@ namespace MyHotels.WebApi.Extensions
         public static void UseCorsPolicy(this IApplicationBuilder app)
         {
             app.UseCors("AllowAll");
+        }
+
+        public static void UseAuthenticationAndAuthorization(this IApplicationBuilder app)
+        {
+            app.UseAuthentication();
+            app.UseAuthorization();
         }
     }
 }

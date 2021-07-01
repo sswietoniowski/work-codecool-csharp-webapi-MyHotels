@@ -84,7 +84,8 @@ namespace MyHotels.WebApi
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            // Authentication & Authorization
+            app.UseAuthenticationAndAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MyHotels.WebApi.Configurations.Entities;
 using MyHotels.WebApi.Domain;
 using System;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MyHotels.WebApi.Data
 {
-    public class MyHotelsDbContext : DbContext
+    public class MyHotelsDbContext : IdentityDbContext<ApiUser>
     {
         public DbSet<Country> Countries { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
@@ -22,6 +23,7 @@ namespace MyHotels.WebApi.Data
 
             builder.ApplyConfiguration(new CountryConfiguration());
             builder.ApplyConfiguration(new HotelConfiguration());
+            builder.ApplyConfiguration(new RoleConfiguration());
         }
     }
 }
