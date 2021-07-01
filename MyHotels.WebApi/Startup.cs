@@ -50,6 +50,9 @@ namespace MyHotels.WebApi
             // Authentication & Identity Management
             services.ConfigureAuthenticationAndIdentityManagement();
 
+            // JWT
+            services.ConfigureJwt(Configuration);
+
             services.AddControllers()
                 // Solves problem with cyclical dependency between countries and hotels.
                 .AddNewtonsoftJson(options => {
