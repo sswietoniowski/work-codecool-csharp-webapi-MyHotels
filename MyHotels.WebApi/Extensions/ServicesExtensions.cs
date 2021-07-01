@@ -6,15 +6,19 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MyHotels.WebApi.Data;
 using MyHotels.WebApi.Domain;
 using MyHotels.WebApi.Infrastructure;
 using MyHotels.WebApi.Models;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,9 +92,19 @@ namespace MyHotels.WebApi.Extensions
             });
         }
 
-        private static ApiVersion ApiVersion(int v1, int v2)
+        public static void ConfigureSwaggerWithVersioning(this IServiceCollection services)
         {
-            throw new NotImplementedException();
+            // based on this blog post: https://referbruv.com/blog/posts/integrating-aspnet-core-api-versions-with-swagger-ui
+
+            services.AddVersionedApiExplorer(setup =>
+            {
+                setup.GroupNameFormat = "'v'VVV";
+                setup.SubstituteApiVersionInUrl = true;
+            });
+
+            services.AddSwaggerGen();
+            services.ConfigureOptions<ConfigureSwaggerOptions>();
+
         }
 
         public static void ConfigureRateLimiting(this IServiceCollection services)
@@ -161,6 +175,20 @@ namespace MyHotels.WebApi.Extensions
             app.UseAuthorization();
         }
 
+        public static void UseSwaggerWithVersioning(this IApplicationBuilder app, IApiVersionDescriptionProvider provider)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    options.SwaggerEndpoint(
+                        $"/swagger/{description.GroupName}/swagger.json",
+                        description.GroupName.ToUpperInvariant());
+                }
+            });
+        }
+
         public static void UseRateLimiting(this IApplicationBuilder app)
         {
             app.UseIpRateLimiting();
@@ -170,6 +198,51 @@ namespace MyHotels.WebApi.Extensions
         {
             app.UseResponseCaching();
             //app.UseHttpCacheHeaders();
+        }
+    }
+
+    class ConfigureSwaggerOptions
+        : IConfigureNamedOptions<SwaggerGenOptions>
+    {
+        private readonly IApiVersionDescriptionProvider provider;
+
+        public ConfigureSwaggerOptions(
+            IApiVersionDescriptionProvider provider)
+        {
+            this.provider = provider;
+        }
+
+        public void Configure(SwaggerGenOptions options)
+        {
+            // add swagger document for every API version discovered
+            foreach (var description in provider.ApiVersionDescriptions)
+            {
+                options.SwaggerDoc(
+                    description.GroupName,
+                    CreateVersionInfo(description));
+            }
+        }
+
+        public void Configure(string name, SwaggerGenOptions options)
+        {
+            Configure(options);
+        }
+
+        private OpenApiInfo CreateVersionInfo(
+                ApiVersionDescription description)
+        {
+            var info = new OpenApiInfo()
+            {
+                Title = "MyHotels.WebApi",
+                Version = description.ApiVersion.ToString()
+            };
+
+            if (description.IsDeprecated)
+            {
+                info.Description += " This API version has been deprecated.";
+            }
+
+            return info;
         }
     }
 }
