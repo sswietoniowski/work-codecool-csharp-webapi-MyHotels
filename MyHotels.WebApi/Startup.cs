@@ -45,15 +45,10 @@ namespace MyHotels.WebApi
 
 
             // CORS - create policy
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll", builder => 
-                {
-                    builder.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader();
-                });
-            });
+            services.ConfigureCorsPolicy();
+
+            // Authentication & Identity Management
+            services.ConfigureAuthenticationAndIdentityManagement();
 
             services.AddControllers()
                 // Solves problem with cyclical dependency between countries and hotels.
@@ -78,12 +73,14 @@ namespace MyHotels.WebApi
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyHotels.WebApi v1"));
             }
 
-            app.ConfigureExceptionHandler();
+            // Our own exception handler
+
+            app.UseCustomExceptionHandler();
 
             app.UseHttpsRedirection();
 
             // CORS
-            app.UseCors("AllowAll");
+            app.UseCorsPolicy();
 
             app.UseRouting();
 

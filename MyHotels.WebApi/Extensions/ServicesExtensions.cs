@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using MyHotels.WebApi.Models;
 using Serilog;
 using System;
@@ -12,7 +13,25 @@ namespace MyHotels.WebApi.Extensions
 {
     public static class ServicesExtensions
     {
-        public static void ConfigureExceptionHandler(this IApplicationBuilder app)
+        public static void ConfigureCorsPolicy(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
+        }
+
+        public static void ConfigureAuthenticationAndIdentityManagement(this IServiceCollection services)
+        {
+
+        }
+
+        public static void UseCustomExceptionHandler(this IApplicationBuilder app)
         {
             app.UseExceptionHandler(error =>
             {
@@ -28,6 +47,11 @@ namespace MyHotels.WebApi.Extensions
                     }
                 });
             });
+        }
+
+        public static void UseCorsPolicy(this IApplicationBuilder app)
+        {
+            app.UseCors("AllowAll");
         }
     }
 }
