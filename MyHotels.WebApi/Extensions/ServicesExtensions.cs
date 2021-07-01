@@ -180,10 +180,13 @@ namespace MyHotels.WebApi.Extensions
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
+                // handling swagger access while published to IIS or Azure
+                string swaggerJsonBasePath = string.IsNullOrWhiteSpace(options.RoutePrefix) ? "." : "..";
+
                 foreach (var description in provider.ApiVersionDescriptions)
                 {
                     options.SwaggerEndpoint(
-                        $"/swagger/{description.GroupName}/swagger.json",
+                        $"{swaggerJsonBasePath}/swagger/{description.GroupName}/swagger.json",
                         description.GroupName.ToUpperInvariant());
                 }
             });
