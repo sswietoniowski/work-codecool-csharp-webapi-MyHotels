@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -57,6 +58,8 @@ namespace MyHotels.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ResponseCache(Duration = 30)]
+        //[HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 45)]
+        //[HttpCacheValidation(MustRevalidate = true)]
         public async Task<ActionResult<CountryDto>> GetCountry(int id)
         {
             _logger.LogInformation($"{nameof(GetCountry)} called...");

@@ -98,7 +98,7 @@ namespace MyHotels.WebApi.Extensions
             //services.AddHttpCacheHeaders(
             //    (expirationOptions) =>
             //    {
-            //        expirationOptions.MaxAge = 60;
+            //        expirationOptions.MaxAge = 120;
             //        expirationOptions.CacheLocation = CacheLocation.Private;
             //    },
             //    (validationOptions) =>
