@@ -58,12 +58,15 @@ namespace MyHotels.WebApi
             // Caching
             services.ConfigureCaching();
 
-            services.AddControllers()
-                // Solves problem with cyclical dependency between countries and hotels.
-                .AddNewtonsoftJson(options => {
-                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                });
-
+            services.AddControllers(config => 
+            {
+                // Defines named caching profile.
+                config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 });
+            })
+            // Solves problem with cyclical dependency between countries and hotels.
+            .AddNewtonsoftJson(options => {
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
 
             services.AddSwaggerGen(c =>
             {
@@ -90,11 +93,11 @@ namespace MyHotels.WebApi
             // CORS
             app.UseCorsPolicy();
 
-            // Throttling
-            app.UseRateLimiting();
-
             // Caching
             app.UseCaching();
+
+            // Throttling
+            app.UseRateLimiting();
 
             app.UseRouting();
 

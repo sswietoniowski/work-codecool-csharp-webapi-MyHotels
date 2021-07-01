@@ -95,16 +95,16 @@ namespace MyHotels.WebApi.Extensions
         public static void ConfigureCaching(this IServiceCollection services)
         {
             services.AddResponseCaching();
-            services.AddHttpCacheHeaders(
-                (expirationOptions) =>
-                {
-                    expirationOptions.MaxAge = 60;
-                    expirationOptions.CacheLocation = CacheLocation.Private;
-                },
-                (validationOptions) =>
-                {
-                    validationOptions.MustRevalidate = true;
-                });
+            //services.AddHttpCacheHeaders(
+            //    (expirationOptions) =>
+            //    {
+            //        expirationOptions.MaxAge = 60;
+            //        expirationOptions.CacheLocation = CacheLocation.Private;
+            //    },
+            //    (validationOptions) =>
+            //    {
+            //        validationOptions.MustRevalidate = true;
+            //    });
         }
 
         public static void UseCustomExceptionHandler(this IApplicationBuilder app)
@@ -144,7 +144,7 @@ namespace MyHotels.WebApi.Extensions
         public static void UseCaching(this IApplicationBuilder app)
         {
             app.UseResponseCaching();
-            app.UseHttpCacheHeaders();
+            //app.UseHttpCacheHeaders();
         }
     }
 }

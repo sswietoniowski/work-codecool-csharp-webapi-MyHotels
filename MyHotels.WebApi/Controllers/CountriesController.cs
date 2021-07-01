@@ -31,6 +31,8 @@ namespace MyHotels.WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        //[ResponseCache(Duration = 60)]
+        [ResponseCache(CacheProfileName = "120SecondsDuration")]
         public async Task<ActionResult<IList<CountryDto>>> GetCountries()
         {
             _logger.LogInformation($"{nameof(GetCountries)} called...");
@@ -54,6 +56,7 @@ namespace MyHotels.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ResponseCache(Duration = 30)]
         public async Task<ActionResult<CountryDto>> GetCountry(int id)
         {
             _logger.LogInformation($"{nameof(GetCountry)} called...");
