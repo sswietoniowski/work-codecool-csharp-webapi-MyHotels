@@ -81,10 +81,10 @@ namespace MyHotels.WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
-                // special configuration for Swagger if we're using versioning
-                app.UseSwaggerWithVersioning(provider);
             }
+
+            // special configuration for Swagger if we're using versioning
+            app.UseSwaggerWithVersioning(provider);
 
             // Our own exception handler
 
