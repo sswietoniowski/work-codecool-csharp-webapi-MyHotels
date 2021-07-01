@@ -16,6 +16,9 @@ namespace MyHotels.WebApi.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
+    //[Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0", Deprecated = true)]
+    [ApiVersion("1.1")]
     public class HotelsController : ControllerBase
     {
         private readonly IUnitOfWork _uow;
@@ -43,10 +46,32 @@ namespace MyHotels.WebApi.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetHotel")]
+        [MapToApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<HotelDto>> GetHotel(int id)
+        {
+            _logger.LogInformation($"{nameof(GetHotel)} called...");
+
+            var hotel = await _uow.Hotels.Get(h => h.Id == id);
+
+            if (hotel == null)
+            {
+                return NotFound($"Not found hotel with id = {id}");
+            }
+
+            var result = _mapper.Map<HotelDto>(hotel);
+
+            return Ok(hotel);
+        }
+
+        [HttpGet("{id:int}", Name = "GetHotel")]
+        [MapToApiVersion("1.1")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<HotelDto>> GetHotel_v11(int id)
         {
             _logger.LogInformation($"{nameof(GetHotel)} called...");
 

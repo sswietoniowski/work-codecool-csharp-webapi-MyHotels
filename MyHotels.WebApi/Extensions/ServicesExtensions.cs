@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -66,6 +68,29 @@ namespace MyHotels.WebApi.Extensions
             });
 
             services.AddScoped<IAuthenticationManager, AuthenticationManager>();
+        }
+
+        public static void ConfigureVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(options =>
+            {
+                options.ReportApiVersions = true;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 1);
+                //options.ApiVersionReader = new QueryStringApiVersionReader("v", "ver", "version", "api-version");
+                //options.ApiVersionReader = new HeaderApiVersionReader("X-Version");
+                //options.ApiVersionReader = new UrlSegmentApiVersionReader();
+                // not recommended to use all at the same time, just for demonstration purposes
+                options.ApiVersionReader = ApiVersionReader.Combine(
+                    new UrlSegmentApiVersionReader(),
+                    new HeaderApiVersionReader("X-Version"),
+                    new QueryStringApiVersionReader("v", "ver", "version", "api-version")); 
+            });
+        }
+
+        private static ApiVersion ApiVersion(int v1, int v2)
+        {
+            throw new NotImplementedException();
         }
 
         public static void ConfigureRateLimiting(this IServiceCollection services)

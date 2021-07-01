@@ -52,6 +52,9 @@ namespace MyHotels.WebApi
             // JWT
             services.ConfigureJwt(Configuration);
 
+            // Versioning
+            services.ConfigureVersioning();
+
             // Throttling
             services.ConfigureRateLimiting();
 
