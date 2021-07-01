@@ -16,6 +16,7 @@ namespace MyHotels.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [ApiVersion("1.1")]
     public class CountriesController : ControllerBase
     {
         private readonly IUnitOfWork _uow;
