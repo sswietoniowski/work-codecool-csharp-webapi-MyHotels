@@ -35,7 +35,8 @@ namespace MyHotels.WebApi
             // DbContext
             services.AddDbContext<MyHotelsDbContext>(options => 
             {
-                options.UseSqlServer(Configuration.GetConnectionString("MssqlConnection"));
+                //options.UseSqlServer(Configuration.GetConnectionString("MssqlConnection"));
+                options.UseSqlite(Configuration.GetConnectionString("SqliteConnection"));
             });
 
             // UnitOfWork
@@ -76,7 +77,7 @@ namespace MyHotels.WebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider, MyHotelsDbContext context)
         {
             if (env.IsDevelopment())
             {
@@ -84,6 +85,9 @@ namespace MyHotels.WebApi
 
                 // special configuration for Swagger if we're using versioning
                 app.UseSwaggerWithVersioning(provider);
+
+                // Just as an example
+                context.Database.EnsureCreated();
             }
 
             // Our own exception handler

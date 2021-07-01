@@ -31,7 +31,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:44335/api/Countries/4",
+					"raw": "https://localhost:44335/api/Countries/3",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -40,7 +40,7 @@
 					"path": [
 						"api",
 						"Countries",
-						"4"
+						"3"
 					]
 				}
 			},
@@ -49,11 +49,21 @@
 		{
 			"name": "Countries - CreateCountry",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhZG1pbmlzdHJhdG9yQGV4YW1wbGUuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIkFkbWluaXN0cmF0b3IiLCJVc2VyIl0sImV4cCI6MTYyNTE0NzkxMSwiaXNzIjoiTXlIb3RlbHMuV2ViQXBpIiwiYXVkIjoiaHR0cDovL215aG90ZWxzLmNvbSJ9.YGG00VuZHOBQJqS2U3C63fFWQGe4WADc-_R5Uc1L4jA",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Russia\",\r\n  \"code\": \"RO\"\r\n}",
+					"raw": "{\r\n  \"name\": \"Sweeden\",\r\n  \"code\": \"SE\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -108,10 +118,20 @@
 		{
 			"name": "Countries - DeleteCountry",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhZG1pbmlzdHJhdG9yQGV4YW1wbGUuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIlVzZXIiLCJBZG1pbmlzdHJhdG9yIl0sImV4cCI6MTYyNTEyOTQ3MiwiaXNzIjoiTXlIb3RlbHMuV2ViQXBpIiwiYXVkIjoiaHR0cDovL215aG90ZWxzLmNvbSJ9.-M8-xpq0pXzJF9r_RE-SzeI1bIVLpVscFqcFjL-sPMw",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:44335/api/Countries/4",
+					"raw": "https://localhost:44335/api/Countries/5",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -120,7 +140,7 @@
 					"path": [
 						"api",
 						"Countries",
-						"4"
+						"5"
 					]
 				}
 			},
@@ -130,9 +150,15 @@
 			"name": "Hotels - GetHotels",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "X-Version",
+						"value": "2.0",
+						"type": "text"
+					}
+				],
 				"url": {
-					"raw": "https://localhost:44335/api/Hotels",
+					"raw": "https://localhost:44335/api/Hotels?PageNumber=2&PageSize=100",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -141,6 +167,16 @@
 					"path": [
 						"api",
 						"Hotels"
+					],
+					"query": [
+						{
+							"key": "PageNumber",
+							"value": "2"
+						},
+						{
+							"key": "PageSize",
+							"value": "100"
+						}
 					]
 				}
 			},
@@ -150,7 +186,13 @@
 			"name": "Hotels - GetHotel",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "X-Version",
+						"value": "1.0",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "https://localhost:44335/api/Hotels/1",
 					"protocol": "https",
@@ -211,7 +253,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:44335/api/Hotels/5",
+					"raw": "https://localhost:44335/api/Hotels/6",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -220,7 +262,7 @@
 					"path": [
 						"api",
 						"Hotels",
-						"5"
+						"6"
 					]
 				}
 			},
@@ -242,6 +284,76 @@
 						"api",
 						"Hotels",
 						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Users - LoginApiUser",
+			"request": {
+				"method": "OPTIONS",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"administrator@example.com\",\r\n  \"password\": \"P@ssw0rd!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44335/api/Users/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Users - RegisterApiUser",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhZG1pbmlzdHJhdG9yQGV4YW1wbGUuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIlVzZXIiLCJBZG1pbmlzdHJhdG9yIl0sImV4cCI6MTYyNTEyODg1NywiaXNzIjoiTXlIb3RlbHMuV2ViQXBpIiwiYXVkIjoiaHR0cDovL215aG90ZWxzLmNvbSJ9.E3qw-3oGZ4kHOFYTnrE_qyPq0FW6JnIRTBqV0FpYp4A",
+							"type": "string"
+						}
+					]
+				},
+				"method": "OPTIONS",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"another@example.com\",\r\n  \"password\": \"P@ssw0rd!\",\r\n  \"firstName\": \"Cool\",\r\n  \"lastName\": \"Guy\",\r\n  \"roles\": [\r\n    \"User\"\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44335/api/Users/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44335",
+					"path": [
+						"api",
+						"Users",
+						"register"
 					]
 				}
 			},
