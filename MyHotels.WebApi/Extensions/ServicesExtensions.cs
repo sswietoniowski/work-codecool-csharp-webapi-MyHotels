@@ -74,7 +74,7 @@ namespace MyHotels.WebApi.Extensions
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtSettings.GetSection("Issuer").Value,
-                    ValidAudience = jwtSettings.GetSection("Aud").Value,
+                    ValidAudience = jwtSettings.GetSection("Audience").Value,
                     IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key))
                 };
             });
