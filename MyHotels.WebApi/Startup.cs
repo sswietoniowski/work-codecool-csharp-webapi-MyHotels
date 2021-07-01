@@ -43,6 +43,18 @@ namespace MyHotels.WebApi
             // Automapper
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+
+            // CORS - create policy
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder => 
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
+
             services.AddControllers()
                 // Solves problem with cyclical dependency between countries and hotels.
                 .AddNewtonsoftJson(options => {
@@ -69,6 +81,9 @@ namespace MyHotels.WebApi
             app.ConfigureExceptionHandler();
 
             app.UseHttpsRedirection();
+
+            // CORS
+            app.UseCors("AllowAll");
 
             app.UseRouting();
 
