@@ -26,6 +26,7 @@ namespace MyHotels.WebApi
             {
                 Log.Information("Application is starting...");
                 CreateHostBuilder(args).Build().Run();
+                Log.Information("Application is closing...");
             }
             catch (Exception exception)
             {
@@ -39,6 +40,7 @@ namespace MyHotels.WebApi
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
