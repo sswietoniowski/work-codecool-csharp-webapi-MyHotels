@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MyHotels.WebApi.Data;
 using MyHotels.WebApi.Domain;
+using MyHotels.WebApi.Infrastructure;
 using MyHotels.WebApi.Models;
 using Serilog;
 using System;
@@ -62,6 +63,7 @@ namespace MyHotels.WebApi.Extensions
         {
             var jwtSettings = configuration.GetSection("Jwt");
             var key = Environment.GetEnvironmentVariable("MY_HOTELS_KEY");
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -78,6 +80,8 @@ namespace MyHotels.WebApi.Extensions
                     IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key))
                 };
             });
+
+            services.AddScoped<IAuthenticationManager, AuthenticationManager>();
         }
 
         public static void UseCorsPolicy(this IApplicationBuilder app)
