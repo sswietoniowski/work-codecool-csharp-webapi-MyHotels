@@ -6,162 +6,158 @@ using Microsoft.Extensions.Logging;
 using MyHotels.WebApi.Domain;
 using MyHotels.WebApi.Infrastructure;
 using MyHotels.WebApi.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyHotels.WebApi.Controllers
+namespace MyHotels.WebApi.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+//[Route("api/v{version:apiVersion}/[controller]")]
+[ApiVersion("1.0", Deprecated = true)]
+[ApiVersion("1.1")]
+public class HotelsController : ControllerBase
 {
+    private readonly IUnitOfWork _uow;
+    private readonly IMapper _mapper;
+    private readonly ILogger<HotelsController> _logger;
 
-    [ApiController]
-    [Route("api/[controller]")]
-    //[Route("api/v{version:apiVersion}/[controller]")]
-    [ApiVersion("1.0", Deprecated = true)]
-    [ApiVersion("1.1")]
-    public class HotelsController : ControllerBase
+    public HotelsController(IUnitOfWork uwo, IMapper mapper, ILogger<HotelsController> logger)
     {
-        private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
-        private readonly ILogger<HotelsController> _logger;
+        this._uow = uwo;
+        this._mapper = mapper;
+        this._logger = logger;
+    }
 
-        public HotelsController(IUnitOfWork uwo, IMapper mapper, ILogger<HotelsController> logger)
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<IList<HotelDto>>> GetHotels()
+    {
+        _logger.LogInformation($"{nameof(GetHotels)} called...");
+
+        var hotels = await _uow.Hotels.GetAll();
+        var results = _mapper.Map<IList<HotelDto>>(hotels);
+
+        return Ok(results);
+    }
+
+    [HttpGet("{id:int}", Name = "GetHotel")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<HotelDto>> GetHotel(int id)
+    {
+        _logger.LogInformation($"{nameof(GetHotel)} called...");
+
+        var hotel = await _uow.Hotels.Get(h => h.Id == id);
+
+        if (hotel == null)
         {
-            this._uow = uwo;
-            this._mapper = mapper;
-            this._logger = logger;
+            return NotFound($"Not found hotel with id = {id}");
         }
 
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IList<HotelDto>>> GetHotels()
+        var result = _mapper.Map<HotelDto>(hotel);
+
+        return Ok(hotel);
+    }
+
+    [HttpGet("{id:int}", Name = "GetHotel")]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<HotelDto>> GetHotel_v11(int id)
+    {
+        _logger.LogInformation($"{nameof(GetHotel)} called...");
+
+        var hotel = await _uow.Hotels.Get(h => h.Id == id, includes: new List<string> { "Country" });
+
+        if (hotel == null)
         {
-            _logger.LogInformation($"{nameof(GetHotels)} called...");
-
-            var hotels = await _uow.Hotels.GetAll();
-            var results = _mapper.Map<IList<HotelDto>>(hotels);
-
-            return Ok(results);
+            return NotFound($"Not found hotel with id = {id}");
         }
 
-        [HttpGet("{id:int}", Name = "GetHotel")]
-        [MapToApiVersion("1.0")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<HotelDto>> GetHotel(int id)
+        var result = _mapper.Map<HotelDto>(hotel);
+
+        return Ok(hotel);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "User,Administrator")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CreateHotel([FromBody] CreateHotelDto hotelDto)
+    {
+        _logger.LogInformation($"{nameof(CreateHotel)} called...");
+
+        if (!ModelState.IsValid)
         {
-            _logger.LogInformation($"{nameof(GetHotel)} called...");
+            _logger.LogError($"Invalid POST attempt in {nameof(CreateHotel)}");
 
-            var hotel = await _uow.Hotels.Get(h => h.Id == id);
-
-            if (hotel == null)
-            {
-                return NotFound($"Not found hotel with id = {id}");
-            }
-
-            var result = _mapper.Map<HotelDto>(hotel);
-
-            return Ok(hotel);
+            return BadRequest(ModelState);
         }
 
-        [HttpGet("{id:int}", Name = "GetHotel")]
-        [MapToApiVersion("1.1")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<HotelDto>> GetHotel_v11(int id)
+        var hotel = _mapper.Map<Hotel>(hotelDto);
+        await _uow.Hotels.Add(hotel);
+        await _uow.Save();
+
+        return CreatedAtRoute("GetHotel", new { id = hotel.Id }, hotel);
+    }
+
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "User,Administrator")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateHotel(int id, [FromBody] UpdateHotelDto hotelDto)
+    {
+        _logger.LogInformation($"{nameof(UpdateHotel)} called...");
+
+        if (!ModelState.IsValid)
         {
-            _logger.LogInformation($"{nameof(GetHotel)} called...");
+            _logger.LogError($"Invalid PUT attempt in {nameof(UpdateHotel)}");
 
-            var hotel = await _uow.Hotels.Get(h => h.Id == id, includes: new List<string> { "Country" });
-
-            if (hotel == null)
-            {
-                return NotFound($"Not found hotel with id = {id}");
-            }
-
-            var result = _mapper.Map<HotelDto>(hotel);
-
-            return Ok(hotel);
+            return BadRequest(ModelState);
         }
 
-        [HttpPost]
-        [Authorize(Roles = "User,Administrator")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateHotel([FromBody] CreateHotelDto hotelDto)
+        var hotel = await _uow.Hotels.Get(h => h.Id == id);
+
+        if (hotel == null)
         {
-            _logger.LogInformation($"{nameof(CreateHotel)} called...");
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError($"Invalid POST attempt in {nameof(CreateHotel)}");
-
-                return BadRequest(ModelState);
-            }
-
-            var hotel = _mapper.Map<Hotel>(hotelDto);
-            await _uow.Hotels.Add(hotel);
-            await _uow.Save();
-
-            return CreatedAtRoute("GetHotel", new { id = hotel.Id }, hotel);
+            return BadRequest("Submitted data is invalid!");
         }
 
-        [HttpPut("{id:int}")]
-        [Authorize(Roles = "User,Administrator")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateHotel(int id, [FromBody] UpdateHotelDto hotelDto)
+        _mapper.Map(hotelDto, hotel);
+        _uow.Hotels.Modify(hotel);
+        await _uow.Save();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteHotel(int id)
+    {
+        _logger.LogInformation($"{nameof(DeleteHotel)} called...");
+
+        var hotel = await _uow.Hotels.Get(h => h.Id == id);
+
+        if (hotel == null)
         {
-            _logger.LogInformation($"{nameof(UpdateHotel)} called...");
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError($"Invalid PUT attempt in {nameof(UpdateHotel)}");
-
-                return BadRequest(ModelState);
-            }
-
-            var hotel = await _uow.Hotels.Get(h => h.Id == id);
-
-            if (hotel == null)
-            {
-                return BadRequest("Submitted data is invalid!");
-            }
-
-            _mapper.Map(hotelDto, hotel);
-            _uow.Hotels.Modify(hotel);
-            await _uow.Save();
-
-            return NoContent();
+            return NotFound($"Not found hotel with id = {id}");
         }
 
-        [HttpDelete("{id:int}")]
-        [Authorize(Roles = "Administrator")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteHotel(int id)
-        {
-            _logger.LogInformation($"{nameof(DeleteHotel)} called...");
+        await _uow.Hotels.Remove(id);
+        await _uow.Save();
 
-            var hotel = await _uow.Hotels.Get(h => h.Id == id);
-
-            if (hotel == null)
-            {
-                return NotFound($"Not found hotel with id = {id}");
-            }
-
-            await _uow.Hotels.Remove(id);
-            await _uow.Save();
-
-            return NoContent();
-        }
+        return NoContent();
     }
 }

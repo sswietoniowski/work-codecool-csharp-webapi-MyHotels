@@ -8,99 +8,98 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using X.PagedList;
 
-namespace MyHotels.WebApi.Infrastructure
+namespace MyHotels.WebApi.Infrastructure;
+
+public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    private readonly MyHotelsDbContext _context;
+    private readonly DbSet<T> _db;
+
+    public GenericRepository(MyHotelsDbContext context)
     {
-        private readonly MyHotelsDbContext _context;
-        private readonly DbSet<T> _db;
+        this._context = context;
+        this._db = _context.Set<T>();
+    }
 
-        public GenericRepository(MyHotelsDbContext context)
+    public async Task Add(T entity)
+    {
+        await _db.AddAsync(entity);
+    }
+
+    public async Task AddRange(IEnumerable<T> entities)
+    {
+        await _db.AddRangeAsync(entities);
+    }
+
+    public async Task<T> Get(Expression<Func<T, bool>> expression = null, List<string> includes = null)
+    {
+        IQueryable<T> query = _db;
+
+        if (includes != null)
         {
-            this._context = context;
-            this._db = _context.Set<T>();
-        }
-
-        public async Task Add(T entity)
-        {
-            await _db.AddAsync(entity);
-        }
-
-        public async Task AddRange(IEnumerable<T> entities)
-        {
-            await _db.AddRangeAsync(entities);
-        }
-
-        public async Task<T> Get(Expression<Func<T, bool>> expression = null, List<string> includes = null)
-        {
-            IQueryable<T> query = _db;
-
-            if (includes != null)
+            foreach (var include in includes)
             {
-                foreach (var include in includes)
-                {
-                    query = query.Include(include);
-                }
+                query = query.Include(include);
             }
-
-            return await query.AsNoTracking().FirstOrDefaultAsync(expression);
         }
 
-        public async Task<IList<T>> GetAll(Expression<Func<T, bool>> expression = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, List<string> includes = null)
-        {
-            IQueryable<T> query = _db;
+        return await query.AsNoTracking().FirstOrDefaultAsync(expression);
+    }
 
-            if (expression != null)
+    public async Task<IList<T>> GetAll(Expression<Func<T, bool>> expression = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, List<string> includes = null)
+    {
+        IQueryable<T> query = _db;
+
+        if (expression != null)
+        {
+            query = query.Where(expression);
+        }
+
+        if (includes != null)
+        {
+            foreach (var include in includes)
             {
-                query = query.Where(expression);
+                query = query.Include(include);
             }
+        }
 
-            if (includes != null)
+        if (orderBy != null)
+        {
+            query = orderBy(query);
+        }
+
+        return await query.AsNoTracking().ToListAsync();
+    } 
+
+    public async Task<IPagedList<T>> GetAllPaged(RequestParams requestParams, List<string> includes = null)
+    {
+        IQueryable<T> query = _db;
+
+        if (includes != null)
+        {
+            foreach (var include in includes)
             {
-                foreach (var include in includes)
-                {
-                    query = query.Include(include);
-                }
+                query = query.Include(include);
             }
-
-            if (orderBy != null)
-            {
-                query = orderBy(query);
-            }
-
-            return await query.AsNoTracking().ToListAsync();
-        } 
-
-        public async Task<IPagedList<T>> GetAllPaged(RequestParams requestParams, List<string> includes = null)
-        {
-            IQueryable<T> query = _db;
-
-            if (includes != null)
-            {
-                foreach (var include in includes)
-                {
-                    query = query.Include(include);
-                }
-            }
-
-            return await query.AsNoTracking().ToPagedListAsync(requestParams.PageNumber, requestParams.PageSize);
         }
 
-        public void Modify(T entity)
-        {
-            _db.Attach(entity);
-            _context.Entry(entity).State = EntityState.Modified;
-        }
+        return await query.AsNoTracking().ToPagedListAsync(requestParams.PageNumber, requestParams.PageSize);
+    }
 
-        public async Task Remove(int id)
-        {
-            var entity = await _db.FindAsync(id);
-            _db.Remove(entity);
-        }
+    public void Modify(T entity)
+    {
+        _db.Attach(entity);
+        _context.Entry(entity).State = EntityState.Modified;
+    }
 
-        public void RemoveRange(IEnumerable<T> entities)
-        {
-            _db.RemoveRange(entities);
-        }
+    public async Task Remove(int id)
+    {
+        var entity = await _db.FindAsync(id);
+        _db.Remove(entity);
+    }
+
+    public void RemoveRange(IEnumerable<T> entities)
+    {
+        _db.RemoveRange(entities);
     }
 }
