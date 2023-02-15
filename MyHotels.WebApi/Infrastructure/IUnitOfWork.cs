@@ -1,15 +1,12 @@
 ﻿using MyHotels.WebApi.Domain;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyHotels.WebApi.Infrastructure
+namespace MyHotels.WebApi.Infrastructure;
+
+public interface IUnitOfWork : IDisposable
 {
-    public interface IUnitOfWork : IDisposable
-    {
-        IGenericRepository<Country> Countries { get; }
-        IGenericRepository<Hotel> Hotels { get; }
-        Task Save();
-    }
+    IGenericRepository<Country> Countries { get; }
+    IGenericRepository<Hotel> Hotels { get; }
+    Task Save();
 }
