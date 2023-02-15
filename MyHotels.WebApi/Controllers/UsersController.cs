@@ -34,7 +34,7 @@ namespace MyHotels.WebApi.Controllers
 
         [HttpOptions]
         [Route("register")]
-        [Authorize(Roles = "Administrator")]
+        //[Authorize(Roles = "Administrator")] // NOTICE: this endpoint is INTENTIONALLY left open for anyone to register as this is only a demo app
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

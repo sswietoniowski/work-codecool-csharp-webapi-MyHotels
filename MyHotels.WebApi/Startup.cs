@@ -90,6 +90,9 @@ namespace MyHotels.WebApi
                 context.Database.EnsureCreated();
             }
 
+            // special configuration for Swagger if we're using versioning
+            app.UseSwaggerWithVersioning(provider);
+
             // Our own exception handler
 
             app.UseCustomExceptionHandler();
