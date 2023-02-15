@@ -50,6 +50,11 @@ Generated\ Files/
 TestResult.xml
 nunit-*.xml
 
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/
